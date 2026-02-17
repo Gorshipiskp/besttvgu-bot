@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "besttvgu-bot"
+version = "0.1.0"
+description = "Telegram bot for BestTvGU"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+
+authors = [
+    { name = "BestTvGU" }
+]
+
+dependencies = [
+    "aiogram>=3.3",
+    "pydantic>=1.10",
+    "pydantic-settings>=2.1",
+    "httpx>=0.25",
+    "numpy>=1.24",
+    "tzdata>=2025.3",
+]
+
+[tool.setuptools]
+packages = ["besttvgu_bot"]
+
+[tool.setuptools.package-data]
+besttvgu_bot = ["py.typed"]

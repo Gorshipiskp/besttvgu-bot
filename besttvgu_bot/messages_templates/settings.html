@@ -1,0 +1,3 @@
+{% for setting in user_settings %}
+<i>{{ setting.display_name }}</i>: <b>{{ setting.format(user) }}</b>
+{% endfor %}

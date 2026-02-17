@@ -1,0 +1,19 @@
+📅 <b>{{ date_str }} {{ week_mark_emoji }}</b>
+
+{% if len(day_lessons) == 0 %}
+<b><i>Пар в этот день нет</i></b>
+
+{% else %}
+{% for lesson_slot in day_lessons %}
+<i>{{ lesson_slot.format_time() }}</i>
+<b>{{ lesson_slot.format_subject_name() }}</b>
+    <i>{{ lesson_slot.format_subject_type() }}</i>
+        <i>{{ lesson_slot.format_teachers() }}</i>
+        <i>{{ lesson_slot.format_place() }}</i>
+
+{% endfor %}
+{% endif %}
+<i>🟢 – По всем неделям</i>
+<i>🔴 – По плюсовым неделям</i>
+<i>🔵 – По минусовым неделям</i>
+<i>✏️ – Изменение в расписании</i>

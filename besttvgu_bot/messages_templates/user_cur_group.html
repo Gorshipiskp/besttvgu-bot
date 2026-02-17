@@ -1,0 +1,14 @@
+<u><b>Группа {{ cur_group.name }}</b></u>
+<i><b>Курс: {{ cur_group.course }} • Набор: {{ cur_group.academic_year }} • {{ group_type_str }}</b></i>
+<i>⛪️ {{ cur_group.struct.name }}</i>
+
+{% if starosta %}
+🎩 <i>Староста:</i> <b>{{ starosta.format_name() }}</b>
+{% else %}
+<i>У группы нет старосты</i>
+{% endif %}
+
+<b>👨‍🎓 Участники группы:</b>
+{% for member_info in members_infos %}
+    • {{ member_info["member"].format_name() }} <i>({{ member_info["user_group"].role.display_name }})</i>
+{% endfor %}
