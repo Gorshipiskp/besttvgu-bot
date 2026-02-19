@@ -1,6 +1,6 @@
 import inspect
 import re
-from datetime import datetime, time
+from datetime import time
 from typing import TypeVar, Awaitable, Callable
 
 from aiogram.exceptions import TelegramBadRequest

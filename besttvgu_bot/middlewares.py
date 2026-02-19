@@ -1,44 +1,61 @@
-import asyncio
 import time
 from typing import Any, TypeVar, Callable, Awaitable
 
 from aiogram import BaseMiddleware
-from aiogram.types import Message, BotCommand, BotCommandScopeChat, Update
+from aiogram.filters.callback_data import CallbackData
+from aiogram.types import Message, Update
 
 from besttvgu_bot.api_contracts.models import UserFullPublic
+from besttvgu_bot.api_contracts.pdn.contracts import check_user_consents
 from besttvgu_bot.api_contracts.user.contracts import get_user
 from besttvgu_bot.config import SHOW_MIDDLEWARES_PERFORMANCE, TELEGRAM_CHANNEL_LINK, WEBSITE_URL
 from besttvgu_bot.consts import Templates
-from besttvgu_bot.misc.caching import user_cache, CacheIdentifiers
+from besttvgu_bot.misc.caching import user_cache, CacheIdentifiers, user_consents_cache
 from besttvgu_bot.misc.jinja import answer_by_template
 from besttvgu_bot.misc.logger import logger
-from besttvgu_bot.modules.commands import get_suitable_commands_for_user, update_user_commands
-from besttvgu_bot.modules.perf_metrics import BotPerformanceMiddleware
+from besttvgu_bot.modules.commands import update_user_commands
+from besttvgu_bot.modules.performance_metrics import BotPerformanceMiddleware
+from besttvgu_bot.router.user_consents.misc import send_consent_agreeing
 
 T = TypeVar("T")
+
+
+class AcceptingConsentsCallbackData(CallbackData, prefix="accept_consents"):
+    is_consents_accepted: bool
 
 
 class CheckRegister(BaseMiddleware):
     async def __call__(
             self,
             handler: Callable[[Update | Message, dict[str, Any]], Awaitable[T]],
-            event: Update | Message,
+            update: Update | Message,
             data: dict[str, Any]
     ) -> T:
         # todo: В будущем сделаем возможность просмотра расписания без непосредственного
-        # вступления в группу и регистрации
+        #  вступления в группу и регистрации
         if data["user"] is None:
             await answer_by_template(
-                event,
-                Templates.NOT_REGISTERED,
-                template_params={
-                    "website_url": data["website_url"]
-                }
+                update,
+                Templates.NOT_REGISTERED
             )
 
             return
 
-        return await handler(event, data)
+        async def check_user_consents_kruto() -> bool:
+            return await check_user_consents(update.from_user.id)
+
+        is_consents_accepted: bool = await user_consents_cache.get_or_set(
+            CacheIdentifiers.check_user_consents(update.from_user.id),
+            check_user_consents_kruto
+        )
+
+        if not is_consents_accepted:
+            await send_consent_agreeing(update)
+            await update.bot.delete_message(update.chat.id, update.message_id)
+
+            return
+
+        return await handler(update, data)
 
 
 class PerformanceMiddlewareBase(BaseMiddleware):
@@ -117,7 +134,7 @@ class PerformanceMessageHandler(PerformanceMiddlewareBase):
         return await self.profiler.measure("message", name, handler, message, data)
 
 
-class UserCommandsMiddlewareBase(PerformanceMiddlewareBase):
+class UserCommandsMiddleware(PerformanceMiddlewareBase):
     async def middleware_logic(self, message: Message, data: dict) -> None:
         user: UserFullPublic | None = data.get("user", False)
 

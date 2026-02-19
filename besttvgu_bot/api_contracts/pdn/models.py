@@ -1,13 +1,14 @@
-from datetime import datetime
-
 from pydantic import BaseModel
 
 
-class PDNConsent(BaseModel):
-    telegram_id: int
-    policy_version: str
-    consent_at: datetime
-    file_hash: str
-    hash_method: str
+class IsUserHasAllConsents(BaseModel):
+    is_consents_accepted: bool
+    non_valid_consents: bool | None = None
+
+    model_config = {"frozen": True}
+
+
+class IsUserConsentsValid(BaseModel):
+    is_valid: bool
 
     model_config = {"frozen": True}

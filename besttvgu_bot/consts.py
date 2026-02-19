@@ -1,5 +1,6 @@
 from enum import Enum
 from logging import INFO, WARNING, ERROR, CRITICAL
+from pathlib import Path
 from typing import Final
 
 
@@ -15,6 +16,9 @@ class Templates(str, Enum):
     OOPS_SOMETHING_WENT_WRONG = "oops_something_went_wrong.html"
     NOT_SO_FAR_IN_SCHEDULE = "not_so_far_in_schedule.html"
     USER_GROUP = "user_cur_group.html"
+    NEED_TO_ACCEPT_CONSENTS = "need_to_accept_consents.html"
+    NOT_ACCEPTING_CONSENTS = "not_accepting_consent.html"
+    USER_ACCEPTED_CONSENTS = "user_accepted_consents.html"
 
 
 # Насколько далеко (кол-во недель) можно пойти в расписании
@@ -27,5 +31,8 @@ LEVELS_TO_LOG: dict[int, str] = {
     CRITICAL: "critical",
 }
 
-PDN_PREFIX: Final[str] = "Политика_конфиденциальности_BestTvGU"
-PDN_VERSION: Final[str] = "v1.0"
+DOCUMENT_HASHES_FILE: Final[str] = "documents_hashes.json"
+DOCUMENTS_DIRNAME: Final[str] = "documents"
+
+DOCUMENTS_DIR: Final[Path] = Path(__file__).parent / DOCUMENTS_DIRNAME
+DOCUMENTS_HASHES_FILE_PATH: Final[Path] = DOCUMENTS_DIR / DOCUMENT_HASHES_FILE

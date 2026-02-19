@@ -3,16 +3,26 @@ from typing import Callable, Awaitable, TypeVar, Any
 
 from cachetools import TTLCache
 
-from besttvgu_bot.config import USER_CACHE_TTL_SECONDS
+from besttvgu_bot.config import USER_CACHE_TTL_SECONDS, USER_AGREEMENT_CACHE_TTL_SECONDS
+from besttvgu_bot.misc.logger import logger
 from besttvgu_bot.misc.misc import maybe_async
 
 T = TypeVar("T")
 
+all_cache: dict[str, "AsyncTTLCache"] = {}
+
 
 class AsyncTTLCache:
-    def __init__(self, maxsize: int, ttl: int) -> None:
+    def __init__(self, name: str, maxsize: int, ttl: int) -> None:
+        self.name = name
         self._cache = TTLCache(maxsize=maxsize, ttl=ttl)
         self._lock = asyncio.Lock()
+
+        if name in all_cache:
+            raise ValueError(f"Cache with name {name} already exists")
+
+        logger.info(f"Created cache {name} with ttl {ttl}")
+        all_cache[name] = self
 
     def __contains__(self, key: str) -> bool:
         return key in self._cache
@@ -72,6 +82,16 @@ class CacheIdentifiers:
     def user_info(cls, telegram_id: int) -> str:
         return f"user_info_{telegram_id}"
 
+    @classmethod
+    def check_user_consents(cls, telegram_id: int) -> str:
+        return f"check_user_consents_{telegram_id}"
+
 
 # Разные TTL
-user_cache: AsyncTTLCache = AsyncTTLCache(maxsize=1000, ttl=USER_CACHE_TTL_SECONDS)
+user_cache: AsyncTTLCache = AsyncTTLCache(
+    name="user_cache", maxsize=5000, ttl=USER_CACHE_TTL_SECONDS
+)
+
+user_consents_cache: AsyncTTLCache = AsyncTTLCache(
+    name="user_consents_cache", maxsize=5000, ttl=USER_AGREEMENT_CACHE_TTL_SECONDS
+)
