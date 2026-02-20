@@ -1,0 +1,43 @@
+<b>👤 Ваш профиль</b>
+
+<b>🆔 Telegram ID:</b> <code>{{ user.telegram_id }}</code>
+<b>👤 Никнейм:</b> <code>{% if user.username %}{{ user.username }}</code>{% else %}<i>Не указан</i>{% endif %}
+
+
+<b>📛 ФИО:</b>
+<i>{{ user.format_name() }}</i>
+
+<b>📆 Дата регистрации:</b>
+<i>{{ user.created_at.strftime("%d.%m.%Y %H:%M") }}</i>
+
+{% if user.role %}
+<b>🌍 Глобальная роль:</b>
+<i>{{ user.role.display_name }}</i>
+{% endif %}
+
+{% if user.dormitory %}
+<b>🏠 Общежитие:</b>
+{{ user.dormitory.name }}
+<i>{{ user.dormitory.address }}</i>
+{% endif %}
+<b>📚 Группы</b>
+{% if user.groups %}
+{% for group in user.groups %}
+
+<b>• {{ group.name }}</b>
+  ├ Курс: <b>{{ group.course }}</b>
+  ├ Тип: <b>{{ format_group_type(group.type) }}</b>
+  ├ Период: <b>{{ group.academic_year }}–{{ group.academic_year + 1 }}</b>
+  └ Роль: {% set ug = groups_ids_to_user_group.get(group.id) %}{% if ug and ug.role %}<b>{{ ug.role.display_name }}</b>
+    {% else %}<i>Не указана</i>{% endif %}
+  {% if group.specialization %}
+  └ Специализация: <b>{{ group.specialization }}</b>
+  {% endif %}
+{% endfor %}
+{% else %}<i>Вы не состоите ни в одной группе</i>{% endif %}
+
+<b>⚙ Настройки</b>
+<b>Текущая группа:</b>{% if user.telegram_settings.cur_group %} {{ user.telegram_settings.cur_group.name }}
+{% else %}
+<i>Не выбрана</i>
+{% endif %}

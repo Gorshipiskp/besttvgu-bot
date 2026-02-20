@@ -1,6 +1,10 @@
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
+import cachetools
+
+from besttvgu_bot.consts import PAIRS_TIMES
+
 
 def now() -> datetime:
     local_tz: ZoneInfo = ZoneInfo("Europe/Moscow")
@@ -56,3 +60,43 @@ def translate_date(date_str: str) -> str:
 
 def is_same_day(date1: datetime, date2: datetime) -> bool:
     return date1.date() == date2.date()
+
+
+def get_date_time(date: datetime) -> tuple[int, int]:
+    return date.hour * 60 + date.minute
+
+
+@cachetools.cached(cache=cachetools.LRUCache(2500))
+def get_lesson_num_by_time(target_time: int | None = None) -> tuple[bool, int] | None:
+    """
+    Функция возвращает номер пары и перерыв ли, либо None, если время неучебное
+
+    Args:
+        target_time: время в минутах (int | None), если None, то берется текущее
+
+    Returns:
+        tuple[bool, int] | None: кортеж, где первый элемент – перемена ли это, а второй – номер пары
+    """
+
+    base_time = target_time if target_time is not None else now()
+    cur_time: int = get_date_time(base_time)
+
+    lessons: list[tuple[int, dict[str, int]]] = sorted(PAIRS_TIMES.items())
+
+    first_start: int = lessons[0][1]["time_start"]
+    if cur_time < first_start:
+        return None
+
+    for idx, (lesson_num, times) in enumerate(lessons):
+        start: int = times["time_start"]
+        end: int = times["time_end"]
+
+        if start <= cur_time < end:
+            return False, lesson_num
+
+        if idx + 1 < len(lessons):
+            next_start: int = lessons[idx + 1][1]["time_start"]
+
+            if end <= cur_time < next_start:
+                return True, lessons[idx + 1][0]
+    return None

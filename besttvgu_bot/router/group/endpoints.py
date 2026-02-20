@@ -10,8 +10,8 @@ from besttvgu_bot.api_contracts.group.models import GroupScheduleInfo
 from besttvgu_bot.api_contracts.models import UserFullPublic, GroupFullPublic, GROUP_TYPES_NAMES, UserGroupPublic, \
     UserPublic
 from besttvgu_bot.consts import Templates, MAX_WEEK_DELTA_SCHEDULE
-from besttvgu_bot.middlewares import CheckRegister
-from besttvgu_bot.misc.caching import user_cache, CacheIdentifiers
+from besttvgu_bot.middlewares import CheckRegisterMiddleware
+from besttvgu_bot.misc.caching import user_cache, CacheIdentifiers, full_groups_cache, groups_schedules_cache
 from besttvgu_bot.misc.datetime_lib import now, translate_date, get_start_of_week, is_same_day
 from besttvgu_bot.misc.jinja import answer_by_template
 from besttvgu_bot.misc.replies import build_reply_keyboard
@@ -24,7 +24,7 @@ from besttvgu_bot.router.user_settings.endpoints import settings
 router: Router = Router(name="schedule")
 
 router.message.middleware(
-    CheckRegister()
+    CheckRegisterMiddleware()
 )
 router.message.middleware(
     GroupCheckMiddleware()
@@ -103,13 +103,30 @@ async def schedule(message: Message, user: UserFullPublic, target_date: datetime
 
     real_now: datetime = now()
 
-    group_schedule: GroupScheduleInfo = await get_group_schedule(user.telegram_settings.cur_group_id)
+    async def get_group_schedule_kruto() -> GroupScheduleInfo:
+        return await get_group_schedule(user.telegram_settings.cur_group_id)
 
-    day_lessons: list[LessonView] = get_day_lessons(group_schedule, target_date)
+    group_schedule: GroupScheduleInfo = await groups_schedules_cache.get_or_set(
+        CacheIdentifiers.group_schedule(user.telegram_settings.cur_group_id),
+        get_group_schedule_kruto
+    )
+
+    day_lessons: list[LessonView] = get_day_lessons(group_schedule, now(), target_date)
 
     week_start: datetime = get_start_of_week(target_date)
 
     inline_buttons: list[InlineKeyboardButton] = []
+
+    if not is_same_day(target_date, now()):
+        inline_buttons.append(
+            InlineKeyboardButton(
+                text="Сегодня 🗓",
+                callback_data=ScheduleMoveCallbackData(
+                    datetime=now().isoformat().replace(":", ".")
+                ).pack()
+            )
+        )
+
     for i in range(7):
         cur_day: datetime = week_start + timedelta(days=i)
 
@@ -168,7 +185,13 @@ async def schedule(message: Message, user: UserFullPublic, target_date: datetime
 
 @router.message(Command("group"))
 async def group(message: Message, user: UserFullPublic) -> None:
-    full_group_info: GroupFullPublic = await get_full_group_info(user.telegram_settings.cur_group.id)
+    async def get_full_group_kruto():
+        return await get_full_group_info(user.telegram_settings.cur_group.id)
+
+    full_group_info: GroupFullPublic = await full_groups_cache.get_or_set(
+        CacheIdentifiers.full_group(user.telegram_settings.cur_group.id),
+        get_full_group_kruto
+    )
 
     members: list[dict[str, UserGroupPublic | UserPublic]] = []
 

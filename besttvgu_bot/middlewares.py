@@ -24,7 +24,7 @@ class AcceptingConsentsCallbackData(CallbackData, prefix="accept_consents"):
     is_consents_accepted: bool
 
 
-class CheckRegister(BaseMiddleware):
+class CheckRegisterMiddleware(BaseMiddleware):
     async def __call__(
             self,
             handler: Callable[[Update | Message, dict[str, Any]], Awaitable[T]],

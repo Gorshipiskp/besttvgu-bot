@@ -5,8 +5,11 @@
 
 {% else %}
 {% for lesson_slot in day_lessons %}
-<i>{{ lesson_slot.format_time() }}</i>
-<b>{{ lesson_slot.format_subject_name() }}</b>
+{% if lesson_slot.is_break %}<u><b>➡️Сейчас мы здесь перемена!⬅️</b></u>
+
+{% endif %}
+<i>{% if lesson_slot.is_cur_lesson %}<u>{{ lesson_slot.format_time() }}</u>{% else %}{{ lesson_slot.format_time() }}{% endif %}</i>
+<b>{% if lesson_slot.is_cur_lesson %}<u>➡️{{ lesson_slot.format_subject_name() }}⬅️</u>{% else %}{{ lesson_slot.format_subject_name() }}{% endif %}</b>
     <i>{{ lesson_slot.format_subject_type() }}</i>
         <i>{{ lesson_slot.format_teachers() }}</i>
         <i>{{ lesson_slot.format_place() }}</i>

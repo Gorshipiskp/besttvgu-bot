@@ -2,14 +2,26 @@ from datetime import datetime
 
 from besttvgu_bot.api_contracts.group.misc import get_week_mark, get_week_mark_emoji
 from besttvgu_bot.api_contracts.group.models import GroupScheduleInfo, WeekMarks, LessonPublic, ScheduleElement
-from besttvgu_bot.api_contracts.models import SubjectPublic, TeacherPublic, SUBJECT_TYPES
+from besttvgu_bot.api_contracts.models import SubjectPublic, TeacherPublic, format_subject_type
+from besttvgu_bot.misc.datetime_lib import get_lesson_num_by_time
 from besttvgu_bot.misc.misc import format_timestamp
 
 
 class LessonView:
-    def __init__(self, group_schedule: GroupScheduleInfo, lesson: LessonPublic) -> None:
+    def __init__(self, group_schedule: GroupScheduleInfo, lesson: LessonPublic, now: datetime) -> None:
         self.lesson: LessonPublic = lesson
         self.group_schedule: GroupScheduleInfo = group_schedule
+        self.now: datetime = now
+
+        cur_lesson_num_info: tuple[bool, int] | None = get_lesson_num_by_time(now)
+
+        if cur_lesson_num_info is None:
+            self.is_break: bool = False
+            self.is_cur_lesson: bool = False
+        else:
+            is_cur_lesson: bool = cur_lesson_num_info[1] == self.lesson.lesson_number
+            self.is_break: bool = cur_lesson_num_info[0] and is_cur_lesson
+            self.is_cur_lesson: bool = is_cur_lesson and not self.is_break
 
         self.subject: SubjectPublic = self.group_schedule.subjects[self.lesson.subject_id]
         self.teachers: list[TeacherPublic] = [
@@ -27,7 +39,7 @@ class LessonView:
     def format_subject_type(self) -> str:
         subject_type: str = self.subject.type
 
-        return SUBJECT_TYPES[subject_type][0]
+        return format_subject_type(subject_type)
 
     def format_teachers(self) -> list[str]:
         # todo: Добавить сортировку по `is_small_teacher`
@@ -40,7 +52,7 @@ class LessonView:
         return f"{self.lesson.lesson_number + 1}. {time_start} - {time_end}"
 
 
-def pick_relevant_lesson(lessons: list[LessonView], cur_date: datetime) -> LessonView | None:
+def pick_relevant_lesson(lessons: list[LessonView], _cur_date: datetime) -> LessonView | None:
     if len(lessons) == 1:
         return lessons[0]
 
@@ -48,10 +60,9 @@ def pick_relevant_lesson(lessons: list[LessonView], cur_date: datetime) -> Lesso
     return lessons[0]
 
 
-def get_day_lessons(group_schedule: GroupScheduleInfo, cur_date: datetime) -> list[LessonView]:
-    week_mark: WeekMarks = get_week_mark(cur_date)
-
-    schedule_day = group_schedule.schedule[cur_date.weekday()]
+def get_day_lessons(group_schedule: GroupScheduleInfo, now: datetime, target_date: datetime) -> list[LessonView]:
+    week_mark: WeekMarks = get_week_mark(target_date)
+    schedule_day = group_schedule.schedule[target_date.weekday()]
 
     lessons: dict[int, LessonView] = {}
 
@@ -68,9 +79,10 @@ def get_day_lessons(group_schedule: GroupScheduleInfo, cur_date: datetime) -> li
         if len(lessons_in_slot) == 0:
             continue
 
-        lessons[lesson_number] = pick_relevant_lesson(lessons_in_slot, cur_date)
+        # todo: Сделать поддержку более одной пары в одном слоте
+        lessons[lesson_number] = pick_relevant_lesson(lessons_in_slot, target_date)
 
-    day_lessons: list[LessonView] = list(LessonView(group_schedule, lesson) for lesson in lessons.values())
-    day_lessons.sort(key=lambda lesson: lesson.lesson.time_start)
+    day_lessons: list[LessonView] = list(LessonView(group_schedule, lesson, now) for lesson in lessons.values())
+    day_lessons.sort(key=lambda lesson_view: lesson_view.lesson.time_start)
 
     return day_lessons

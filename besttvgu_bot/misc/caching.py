@@ -3,7 +3,8 @@ from typing import Callable, Awaitable, TypeVar, Any
 
 from cachetools import TTLCache
 
-from besttvgu_bot.config import USER_CACHE_TTL_SECONDS, USER_AGREEMENT_CACHE_TTL_SECONDS
+from besttvgu_bot.config import USER_CACHE_TTL_SECONDS, USER_AGREEMENT_CACHE_TTL_SECONDS, FULL_GROUPS_CACHE_TTL_SECONDS, \
+    GROUPS_SCHEDULE_CACHE_TTL_SECONDS
 from besttvgu_bot.misc.logger import logger
 from besttvgu_bot.misc.misc import maybe_async
 
@@ -86,6 +87,14 @@ class CacheIdentifiers:
     def check_user_consents(cls, telegram_id: int) -> str:
         return f"check_user_consents_{telegram_id}"
 
+    @classmethod
+    def full_group(cls, group_id: int) -> str:
+        return f"full_groups_cache_{group_id}"
+
+    @classmethod
+    def group_schedule(cls, group_id: int) -> str:
+        return f"group_schedule_{group_id}"
+
 
 # Разные TTL
 user_cache: AsyncTTLCache = AsyncTTLCache(
@@ -94,4 +103,12 @@ user_cache: AsyncTTLCache = AsyncTTLCache(
 
 user_consents_cache: AsyncTTLCache = AsyncTTLCache(
     name="user_consents_cache", maxsize=5000, ttl=USER_AGREEMENT_CACHE_TTL_SECONDS
+)
+
+full_groups_cache: AsyncTTLCache = AsyncTTLCache(
+    name="full_groups_cache", maxsize=5000, ttl=FULL_GROUPS_CACHE_TTL_SECONDS
+)
+
+groups_schedules_cache: AsyncTTLCache = AsyncTTLCache(
+    name="groups_schedules_cache", maxsize=5000, ttl=GROUPS_SCHEDULE_CACHE_TTL_SECONDS
 )

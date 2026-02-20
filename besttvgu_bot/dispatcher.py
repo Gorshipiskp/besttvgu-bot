@@ -11,6 +11,7 @@ from besttvgu_bot.router.group.endpoints import router as group_router
 from besttvgu_bot.router.registration.endpoints import router as registration_router
 from besttvgu_bot.router.user_consents.endpoints import router as user_consents_router
 from besttvgu_bot.router.user_settings.endpoints import router as user_settings_router
+from besttvgu_bot.router.user.endpoints import router as user_router
 
 
 def create_dispatcher() -> Dispatcher:
@@ -47,3 +48,4 @@ def setup_routers(dp: Dispatcher) -> None:
     dp.include_router(group_router)
     dp.include_router(user_settings_router)
     dp.include_router(user_consents_router)
+    dp.include_router(user_router)

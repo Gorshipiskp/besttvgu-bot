@@ -19,6 +19,7 @@ class Templates(str, Enum):
     NEED_TO_ACCEPT_CONSENTS = "need_to_accept_consents.html"
     NOT_ACCEPTING_CONSENTS = "not_accepting_consent.html"
     USER_ACCEPTED_CONSENTS = "user_accepted_consents.html"
+    PROFILE = "profile.html"
 
 
 # Насколько далеко (кол-во недель) можно пойти в расписании
@@ -36,3 +37,13 @@ DOCUMENTS_DIRNAME: Final[str] = "documents"
 
 DOCUMENTS_DIR: Final[Path] = Path(__file__).parent / DOCUMENTS_DIRNAME
 DOCUMENTS_HASHES_FILE_PATH: Final[Path] = DOCUMENTS_DIR / DOCUMENT_HASHES_FILE
+
+PAIRS_TIMES: Final[dict[int, dict[str, int]]] = {
+    0: {'time_start': 510, 'time_end': 605},
+    1: {'time_start': 615, 'time_end': 710},
+    2: {'time_start': 730, 'time_end': 825},
+    3: {'time_start': 840, 'time_end': 935},
+    4: {'time_start': 955, 'time_end': 1050},
+    5: {'time_start': 1065, 'time_end': 1160},
+    6: {'time_start': 1170, 'time_end': 1260}
+}

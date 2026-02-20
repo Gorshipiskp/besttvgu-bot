@@ -318,3 +318,11 @@ class UserFullPublic(UserTechPublic):
     groups: list[GroupPublic]
     user_groups: list[UserGroupPublic]
     telegram_settings: TelegramSettingsPublic
+
+
+def format_subject_type(subject_type: str) -> str:
+    return SUBJECT_TYPES[subject_type][0]
+
+
+def format_group_type(group_type: str) -> str:
+    return GROUP_TYPES_NAMES[group_type]
