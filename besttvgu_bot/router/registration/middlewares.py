@@ -77,10 +77,10 @@ class RegistrationService:
         return None
 
 
-class ServicesMiddleware(BaseMiddleware):
-    def __init__(self, registration_service):
-        self.registration_service = registration_service
+class RegistrationServicesMiddleware(BaseMiddleware):
+    def __init__(self, registration_service: RegistrationService):
+        self.registration_service: RegistrationService = registration_service
 
     async def __call__(self, handler, event, data):
-        data["service"] = self.registration_service
+        data["reg_service"] = self.registration_service
         return await handler(event, data)

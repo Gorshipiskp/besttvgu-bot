@@ -9,9 +9,10 @@ from besttvgu_bot.router.cancel.endpoints import router as cancel_router
 from besttvgu_bot.router.general.endpoints import router as general_router
 from besttvgu_bot.router.group.endpoints import router as group_router
 from besttvgu_bot.router.registration.endpoints import router as registration_router
+from besttvgu_bot.router.user.endpoints import router as user_router
 from besttvgu_bot.router.user_consents.endpoints import router as user_consents_router
 from besttvgu_bot.router.user_settings.endpoints import router as user_settings_router
-from besttvgu_bot.router.user.endpoints import router as user_router
+from besttvgu_bot.router.admin.endpoints import router as admin_router
 
 
 def create_dispatcher() -> Dispatcher:
@@ -43,9 +44,11 @@ def setup_routers(dp: Dispatcher) -> None:
     # `cancel_router` Должен быть первым
     dp.include_router(cancel_router)
 
-    dp.include_router(general_router)
-    dp.include_router(registration_router)
-    dp.include_router(group_router)
     dp.include_router(user_settings_router)
     dp.include_router(user_consents_router)
     dp.include_router(user_router)
+    dp.include_router(general_router)
+    dp.include_router(registration_router)
+    dp.include_router(group_router)
+
+    dp.include_router(admin_router)

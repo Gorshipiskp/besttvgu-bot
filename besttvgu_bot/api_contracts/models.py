@@ -245,7 +245,7 @@ class TelegramSettingsPublic(BaseModel):
             "cur_group"
         }, **kwargs)
 
-    async def update_user_settings(self, user: "UserFullPublic", update: dict[str, Any]) -> None:
+    async def update_user_settings(self, user: "UserFull", update: dict[str, Any]) -> None:
         new_settings: TelegramSettingsPublic = self.model_copy(update=update)
 
         if user.telegram_settings.cur_group_id != new_settings.cur_group_id:
@@ -290,13 +290,13 @@ class UserPublic(BaseModel):
             return f"{self.lastname} {self.firstname} {self.patronymic}"
 
 
-class GroupFullPublic(GroupPublic):
+class GroupFull(GroupPublic):
     struct: StructPublic
     users_groups: list[UserGroupPublic]
     members: list[UserPublic]
 
 
-async def get_group_info(group_id: int) -> GroupFullPublic:
+async def get_group_info(group_id: int) -> GroupFull:
     return await api_post(
         "get_group_info",
         {
@@ -306,15 +306,15 @@ async def get_group_info(group_id: int) -> GroupFullPublic:
     )
 
 
-class UserTechPublic(UserPublic):
+class UserTech(UserPublic):
     telegram_id: int
+    role: RolePublic | None
 
 
-class UserFullPublic(UserTechPublic):
+class UserFull(UserTech):
     created_at: DateTime
 
     dormitory: DormitoryPublic | None
-    role: RolePublic | None
     groups: list[GroupPublic]
     user_groups: list[UserGroupPublic]
     telegram_settings: TelegramSettingsPublic

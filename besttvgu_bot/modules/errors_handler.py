@@ -4,14 +4,14 @@ from datetime import datetime
 from typing import Any
 
 from aiogram import Router, Bot
-from aiogram.types import ErrorEvent, BufferedInputFile, Update, Message
+from aiogram.types import ErrorEvent, BufferedInputFile, Message
 
-from besttvgu_bot.api_contracts.models import UserTechPublic
-from besttvgu_bot.api_contracts.tech_admins.contracts import get_tech_admins
+from besttvgu_bot.api_contracts.models import UserTech
 from besttvgu_bot.config import bot_settings
 from besttvgu_bot.consts import Templates
 from besttvgu_bot.misc.jinja import answer_by_template
 from besttvgu_bot.misc.logger import logger
+from besttvgu_bot.api_contracts.tech_admins.misc import get_tech_admins
 
 router = Router(name="errors_handler")
 
@@ -58,7 +58,7 @@ async def send_error_report(
     ).encode("UTF-8")
 
     try:
-        tech_admins: list[UserTechPublic] = await get_tech_admins()
+        tech_admins: list[UserTech] = await get_tech_admins()
     except Exception:
         logger.exception("Failed to fetch tech admins")
         return

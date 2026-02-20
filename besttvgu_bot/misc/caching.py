@@ -4,7 +4,7 @@ from typing import Callable, Awaitable, TypeVar, Any
 from cachetools import TTLCache
 
 from besttvgu_bot.config import USER_CACHE_TTL_SECONDS, USER_AGREEMENT_CACHE_TTL_SECONDS, FULL_GROUPS_CACHE_TTL_SECONDS, \
-    GROUPS_SCHEDULE_CACHE_TTL_SECONDS
+    GROUPS_SCHEDULE_CACHE_TTL_SECONDS, TECH_ADMINS_CACHE_TTL_SECONDS
 from besttvgu_bot.misc.logger import logger
 from besttvgu_bot.misc.misc import maybe_async
 
@@ -95,6 +95,10 @@ class CacheIdentifiers:
     def group_schedule(cls, group_id: int) -> str:
         return f"group_schedule_{group_id}"
 
+    @classmethod
+    def tech_admins(cls) -> str:
+        return f"tech_admins"
+
 
 # Разные TTL
 user_cache: AsyncTTLCache = AsyncTTLCache(
@@ -111,4 +115,8 @@ full_groups_cache: AsyncTTLCache = AsyncTTLCache(
 
 groups_schedules_cache: AsyncTTLCache = AsyncTTLCache(
     name="groups_schedules_cache", maxsize=5000, ttl=GROUPS_SCHEDULE_CACHE_TTL_SECONDS
+)
+
+tech_admins_cache: AsyncTTLCache = AsyncTTLCache(
+    name="tech_admins_cache", maxsize=5000, ttl=TECH_ADMINS_CACHE_TTL_SECONDS
 )

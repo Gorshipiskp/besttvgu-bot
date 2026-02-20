@@ -3,14 +3,14 @@ from typing import Callable, Any, Awaitable, TypeVar
 from aiogram import BaseMiddleware
 from aiogram.types import Message, Update
 
-from besttvgu_bot.api_contracts.models import UserFullPublic
+from besttvgu_bot.api_contracts.models import UserFull
 from besttvgu_bot.consts import Templates
 from besttvgu_bot.middlewares import get_user_kruto_data
 from besttvgu_bot.misc.jinja import answer_by_template
 from besttvgu_bot.modules.user_settings import USER_SETTINGS_BY_CODE
 
 
-async def check_n_get_group_id(message: Message, user: UserFullPublic, website_url: str) -> tuple[bool, int | None]:
+async def check_n_get_group_id(message: Message, user: UserFull, website_url: str) -> tuple[bool, int | None]:
     """
     Проверка пользователя на наличие групп и её выбор группы
 

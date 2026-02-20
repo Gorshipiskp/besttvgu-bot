@@ -2,7 +2,7 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message, InlineKeyboardButton
 
-from besttvgu_bot.api_contracts.models import UserFullPublic
+from besttvgu_bot.api_contracts.models import UserFull
 from besttvgu_bot.consts import Templates
 from besttvgu_bot.misc.jinja import answer_by_template
 from besttvgu_bot.misc.replies import build_reply_keyboard
@@ -27,7 +27,7 @@ add_user_setting(
 async def handle_call_setting(
         callback_query: CallbackQuery,
         callback_data: CallSettingCallbackData,
-        user: UserFullPublic
+        user: UserFull
 ) -> None:
     if callback_data.setting_name not in USER_SETTINGS_BY_CODE:
         return
@@ -37,7 +37,7 @@ async def handle_call_setting(
 
 
 @router.message(Command("settings"))
-async def settings(message: Message, user: UserFullPublic, edit: bool = False) -> None:
+async def settings(message: Message, user: UserFull, edit: bool = False) -> None:
     settings_buttons: list[InlineKeyboardButton] = [
         InlineKeyboardButton(
             text=setting.display_name,

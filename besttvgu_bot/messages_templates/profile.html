@@ -25,14 +25,14 @@
 {% for group in user.groups %}
 
 <b>• {{ group.name }}</b>
-  ├ Курс: <b>{{ group.course }}</b>
-  ├ Тип: <b>{{ format_group_type(group.type) }}</b>
-  ├ Период: <b>{{ group.academic_year }}–{{ group.academic_year + 1 }}</b>
-  └ Роль: {% set ug = groups_ids_to_user_group.get(group.id) %}{% if ug and ug.role %}<b>{{ ug.role.display_name }}</b>
-    {% else %}<i>Не указана</i>{% endif %}
-  {% if group.specialization %}
-  └ Специализация: <b>{{ group.specialization }}</b>
-  {% endif %}
+├ Курс: <b>{{ group.course }}</b>
+├ Тип: <b>{{ format_group_type(group.type) }}</b>
+├ Период: <b>{{ group.academic_year }}–{{ group.academic_year + 1 }}</b>
+└ Роль: {% set ug = groups_ids_to_user_group.get(group.id) %}{% if ug and ug.role %}<b>{{ ug.role.display_name }}</b>
+{% else %}<i>Не указана</i>{% endif %}
+{% if group.specialization %}
+└ Специализация: <b>{{ group.specialization }}</b>
+{% endif %}
 {% endfor %}
 {% else %}<i>Вы не состоите ни в одной группе</i>{% endif %}
 

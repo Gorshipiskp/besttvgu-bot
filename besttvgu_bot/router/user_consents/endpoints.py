@@ -1,7 +1,7 @@
 from aiogram import Router
 from aiogram.types import CallbackQuery, InlineKeyboardButton
 
-from besttvgu_bot.api_contracts.pdn.contracts import accept_user_consents
+from besttvgu_bot.api_contracts.pdn.contracts import accept_user_consents_contract
 from besttvgu_bot.config import USER_CONSENTS
 from besttvgu_bot.consts import Templates
 from besttvgu_bot.middlewares import AcceptingConsentsCallbackData
@@ -20,7 +20,7 @@ async def handle_call_setting(
         callback_data: AcceptingConsentsCallbackData
 ) -> None:
     if callback_data.is_consents_accepted:
-        await accept_user_consents(callback_query.from_user.id)
+        await accept_user_consents_contract(callback_query.from_user.id)
 
         await answer_by_template(
             callback_query.message,

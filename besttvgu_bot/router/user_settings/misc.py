@@ -1,14 +1,13 @@
-
 from aiogram.methods import SendMessage
 from aiogram.types import InlineKeyboardButton, Message
 
-from besttvgu_bot.api_contracts.models import UserFullPublic
+from besttvgu_bot.api_contracts.models import UserFull
 from besttvgu_bot.misc.misc import safe_answer
 from besttvgu_bot.misc.replies import build_reply_keyboard
 from besttvgu_bot.router.group.callbacks_datas import ChooseGroupCallbackData
 
 
-async def send_choose_group(message: Message, user: UserFullPublic) -> SendMessage:
+async def send_choose_group(message: Message, user: UserFull) -> SendMessage:
     groups_buttons: list[InlineKeyboardButton] = [
         InlineKeyboardButton(
             text=group.name,
@@ -24,5 +23,5 @@ async def send_choose_group(message: Message, user: UserFullPublic) -> SendMessa
     )
 
 
-def format_user_group(user: UserFullPublic) -> str:
+def format_user_group(user: UserFull) -> str:
     return "Не указана" if user.telegram_settings.cur_group is None else user.telegram_settings.cur_group.name

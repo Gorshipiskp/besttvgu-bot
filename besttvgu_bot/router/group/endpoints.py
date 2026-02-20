@@ -4,10 +4,10 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, BotCommand, InlineKeyboardButton
 
-from besttvgu_bot.api_contracts.group.contracts import get_group_schedule, get_full_group_info
+from besttvgu_bot.api_contracts.group.contracts import get_group_schedule_contract, get_full_group_info_contract
 from besttvgu_bot.api_contracts.group.misc import get_week_mark, get_week_mark_emoji
 from besttvgu_bot.api_contracts.group.models import GroupScheduleInfo
-from besttvgu_bot.api_contracts.models import UserFullPublic, GroupFullPublic, GROUP_TYPES_NAMES, UserGroupPublic, \
+from besttvgu_bot.api_contracts.models import UserFull, GroupFull, GROUP_TYPES_NAMES, UserGroupPublic, \
     UserPublic
 from besttvgu_bot.consts import Templates, MAX_WEEK_DELTA_SCHEDULE
 from besttvgu_bot.middlewares import CheckRegisterMiddleware
@@ -59,13 +59,13 @@ register_command(
 async def handle_choose_group(
         callback_query: CallbackQuery,
         callback_data: ChooseGroupCallbackData,
-        user: UserFullPublic
+        user: UserFull
 ) -> None:
     await user.telegram_settings.update_user_settings(user, {"cur_group_id": callback_data.group_id})
 
     await callback_query.answer("Текущая группа изменена ✅")
 
-    user: UserFullPublic = user_cache[CacheIdentifiers.user_info(user.telegram_id)]
+    user: UserFull = user_cache[CacheIdentifiers.user_info(user.telegram_id)]
     await settings(callback_query.message, user, edit=True)
 
 
@@ -73,7 +73,7 @@ async def handle_choose_group(
 async def handle_schedule_move_group(
         callback_query: CallbackQuery,
         callback_data: ScheduleMoveCallbackData,
-        user: UserFullPublic
+        user: UserFull
 ) -> None:
     if callback_data.datetime == "today":
         target_date: datetime = now()
@@ -84,7 +84,7 @@ async def handle_schedule_move_group(
 
 
 @router.message(Command("schedule"))
-async def schedule(message: Message, user: UserFullPublic, target_date: datetime = None, edit: bool = False) -> None:
+async def schedule(message: Message, user: UserFull, target_date: datetime = None, edit: bool = False) -> None:
     if user.telegram_settings.cur_group.no_schedule:
         await answer_by_template(
             message,
@@ -104,7 +104,7 @@ async def schedule(message: Message, user: UserFullPublic, target_date: datetime
     real_now: datetime = now()
 
     async def get_group_schedule_kruto() -> GroupScheduleInfo:
-        return await get_group_schedule(user.telegram_settings.cur_group_id)
+        return await get_group_schedule_contract(user.telegram_settings.cur_group_id)
 
     group_schedule: GroupScheduleInfo = await groups_schedules_cache.get_or_set(
         CacheIdentifiers.group_schedule(user.telegram_settings.cur_group_id),
@@ -184,11 +184,11 @@ async def schedule(message: Message, user: UserFullPublic, target_date: datetime
 
 
 @router.message(Command("group"))
-async def group(message: Message, user: UserFullPublic) -> None:
+async def group(message: Message, user: UserFull) -> None:
     async def get_full_group_kruto():
-        return await get_full_group_info(user.telegram_settings.cur_group.id)
+        return await get_full_group_info_contract(user.telegram_settings.cur_group.id)
 
-    full_group_info: GroupFullPublic = await full_groups_cache.get_or_set(
+    full_group_info: GroupFull = await full_groups_cache.get_or_set(
         CacheIdentifiers.full_group(user.telegram_settings.cur_group.id),
         get_full_group_kruto
     )

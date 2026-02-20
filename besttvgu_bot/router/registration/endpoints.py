@@ -6,8 +6,8 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, BotCommand
 
-from besttvgu_bot.api_contracts.models import UserFullPublic
-from besttvgu_bot.api_contracts.registration.contracts import register_user
+from besttvgu_bot.api_contracts.models import UserFull
+from besttvgu_bot.api_contracts.registration.contracts import register_user_contract
 from besttvgu_bot.api_contracts.registration.models import UserToRegister
 from besttvgu_bot.consts import Templates
 from besttvgu_bot.middlewares import update_user
@@ -18,12 +18,12 @@ from besttvgu_bot.misc.replies import cancel_kb
 from besttvgu_bot.modules.commands import register_command, CommandAccessibilityInfo, InfoAvailability, \
     update_user_commands
 from besttvgu_bot.modules.errors_handler import send_error_report
-from besttvgu_bot.router.registration.middlewares import ServicesMiddleware, RegistrationService, Registration
+from besttvgu_bot.router.registration.middlewares import RegistrationServicesMiddleware, RegistrationService, Registration
 
 router: Router = Router(name="registration")
 
 router.message.middleware(
-    ServicesMiddleware(registration_service=RegistrationService())
+    RegistrationServicesMiddleware(registration_service=RegistrationService())
 )
 
 register_command(
@@ -44,7 +44,7 @@ async def start_register(
         message: Message,
         is_registered: bool,
         state: FSMContext,
-        service: RegistrationService
+        reg_service: RegistrationService
 ) -> None:
     if is_registered:
         await answer_by_template(
@@ -53,7 +53,7 @@ async def start_register(
         )
         return
 
-    prompt: str | None = await service.start(message.from_user, state)
+    prompt: str | None = await reg_service.start(message.from_user, state)
 
     if prompt:
         await safe_answer(message, prompt, reply_markup=cancel_kb)
@@ -75,7 +75,7 @@ async def finish_registration(message: Message, state: FSMContext) -> None:
     data: dict[str, Any] = await state.get_data()
 
     try:
-        new_user: UserFullPublic = await register_user(
+        new_user: UserFull = await register_user_contract(
             UserToRegister(
                 telegram_id=message.from_user.id,
                 username=data.get("username"),

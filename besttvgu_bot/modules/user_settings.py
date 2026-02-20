@@ -3,7 +3,7 @@ from typing import Callable, Awaitable
 
 from aiogram.types import Message, BotCommand
 
-from besttvgu_bot.api_contracts.models import UserFullPublic
+from besttvgu_bot.api_contracts.models import UserFull
 from besttvgu_bot.modules.commands import register_command, CommandAccessibilityInfo, InfoAvailability
 
 
@@ -12,8 +12,8 @@ class UserSetting:
     code: str
     display_name: str
     description: str
-    format: Callable[[UserFullPublic], str | Awaitable[str]]
-    call_handler: Callable[[Message, UserFullPublic], Awaitable[None]]
+    format: Callable[[UserFull], str | Awaitable[str]]
+    call_handler: Callable[[Message, UserFull], Awaitable[None]]
 
 
 USER_SETTINGS: list[UserSetting, ...] = []

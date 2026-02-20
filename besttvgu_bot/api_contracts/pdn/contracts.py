@@ -7,14 +7,14 @@ class ConsentsIsInvalid(Exception):
     pass
 
 
-async def get_user_consents() -> UserConsents:
+async def get_user_consents_contract() -> UserConsents:
     return await api_get(
         "get_user_required_consents",
         UserConsents
     )
 
 
-async def validate_user_consents_documents(
+async def validate_user_consents_documents_contract(
         policy_version: str,
         policy_hash: str,
         agreement_version: str,
@@ -39,7 +39,7 @@ async def validate_user_consents_documents(
     return validity_info.is_valid
 
 
-async def check_user_consents(telegram_id: int) -> bool:
+async def check_user_consents_contract(telegram_id: int) -> bool:
     consented_info: IsUserHasAllConsents = await api_post(
         "check_user_consents",
         {
@@ -54,7 +54,7 @@ async def check_user_consents(telegram_id: int) -> bool:
     return consented_info.is_consents_accepted
 
 
-async def accept_user_consents(telegram_id: int) -> None:
+async def accept_user_consents_contract(telegram_id: int) -> None:
     await api_post(
         "accept_user_consents",
         {

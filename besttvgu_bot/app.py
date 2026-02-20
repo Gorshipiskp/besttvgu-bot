@@ -1,6 +1,7 @@
 from aiogram import Bot, Dispatcher
 
-from besttvgu_bot.api_contracts.pdn.contracts import get_user_consents, validate_user_consents_documents
+from besttvgu_bot.api_contracts.pdn.contracts import get_user_consents_contract, \
+    validate_user_consents_documents_contract
 from besttvgu_bot.bot import create_bot
 from besttvgu_bot.config import bot_settings
 from besttvgu_bot.consts import DOCUMENTS_HASHES_FILE_PATH, DOCUMENTS_DIR
@@ -18,7 +19,7 @@ async def start_besttvgu_bot() -> None:
     await bot.set_my_commands(default_commands)
 
     # Список документов требуют обязательного согласования с бэкендом
-    important_documents: UserConsents = await get_user_consents()
+    important_documents: UserConsents = await get_user_consents_contract()
     logger.info("User consents received")
 
     documents_handler: DocumentsHandler = DocumentsHandler(
@@ -37,7 +38,7 @@ async def start_besttvgu_bot() -> None:
 
     bot.documents_handler = documents_handler
 
-    await validate_user_consents_documents(
+    await validate_user_consents_documents_contract(
         policy_version=important_documents.policy.version,
         policy_hash=documents_handler.get_document_hash("policy"),
         agreement_version=important_documents.agreement.version,

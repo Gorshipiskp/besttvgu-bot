@@ -47,3 +47,5 @@ PAIRS_TIMES: Final[dict[int, dict[str, int]]] = {
     5: {'time_start': 1065, 'time_end': 1160},
     6: {'time_start': 1170, 'time_end': 1260}
 }
+
+MIN_TECH_ADMIN_LEVEL: Final[int] = 70

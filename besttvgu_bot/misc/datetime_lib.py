@@ -1,3 +1,7 @@
+"""
+todo: Добавить таких комментов к файлам
+"""
+
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 

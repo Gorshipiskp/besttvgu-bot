@@ -4,7 +4,7 @@ from enum import Enum
 
 from aiogram.types import BotCommand, Message, BotCommandScopeChat
 
-from besttvgu_bot.api_contracts.models import UserFullPublic
+from besttvgu_bot.api_contracts.models import UserFull
 from besttvgu_bot.misc.logger import logger
 
 # Это команды, доступные всем (вне зависимости ни от чего)
@@ -51,7 +51,7 @@ def availability_command_for_user(user_level: int | None, access_info: CommandAc
     return access_info.min_role_level <= user_level <= access_info.max_role_level
 
 
-def get_suitable_commands_for_user(user: UserFullPublic | None) -> list[BotCommand]:
+def get_suitable_commands_for_user(user: UserFull | None) -> list[BotCommand]:
     commands: list[BotCommand] = [*default_commands]
     user_role_level: int | None = None if user is None else user.role.level
 
@@ -62,7 +62,7 @@ def get_suitable_commands_for_user(user: UserFullPublic | None) -> list[BotComma
     return commands
 
 
-async def update_user_commands(user: UserFullPublic | None, message: Message) -> None:
+async def update_user_commands(user: UserFull | None, message: Message) -> None:
     suitable_commands: list[BotCommand] = get_suitable_commands_for_user(user)
 
     # todo: Тут потом либо навесим условия для аккуратного изменения команд, чтобы не делать лишние запросы,

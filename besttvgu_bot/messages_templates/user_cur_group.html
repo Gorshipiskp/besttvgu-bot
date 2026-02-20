@@ -10,5 +10,5 @@
 
 <b>👨‍🎓 Участники группы:</b>
 {% for member_info in members_infos %}
-    • {{ member_info["member"].format_name() }} <i>({{ member_info["user_group"].role.display_name }})</i>
+• {{ member_info["member"].format_name() }} <i>({{ member_info["user_group"].role.display_name }})</i>
 {% endfor %}

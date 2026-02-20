@@ -1,9 +1,9 @@
 from besttvgu_bot.api_contracts.api_requests import api_post
 from besttvgu_bot.api_contracts.group.models import GroupScheduleInfo
-from besttvgu_bot.api_contracts.models import GroupFullPublic
+from besttvgu_bot.api_contracts.models import GroupFull
 
 
-async def get_group_schedule(group_id: int) -> GroupScheduleInfo:
+async def get_group_schedule_contract(group_id: int) -> GroupScheduleInfo:
     return await api_post(
         "get_group_schedule",
         {
@@ -13,11 +13,11 @@ async def get_group_schedule(group_id: int) -> GroupScheduleInfo:
     )
 
 
-async def get_full_group_info(group_id: int) -> GroupFullPublic:
+async def get_full_group_info_contract(group_id: int) -> GroupFull:
     return await api_post(
         "get_full_group_info",
         {
             "group_id": group_id
         },
-        GroupFullPublic
+        GroupFull
     )

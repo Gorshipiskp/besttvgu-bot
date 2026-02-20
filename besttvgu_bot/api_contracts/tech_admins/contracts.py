@@ -1,10 +1,15 @@
 from besttvgu_bot.api_contracts.api_requests import api_get
-from besttvgu_bot.api_contracts.models import UserTechPublic
+from besttvgu_bot.api_contracts.models import UserTech
 from besttvgu_bot.api_contracts.tech_admins.models import TechAdminsAPI
 
 
-# todo: Закешировать, но обязательно с TTL
-async def get_tech_admins() -> list[UserTechPublic]:
+async def get_tech_admins_contract() -> list[UserTech]:
+    """
+    Возвращает список всех технических администраторов
+
+    Returns:
+        Список всех технических администраторов в формате `UserTechPublic`
+    """
     tech_admins_resp: TechAdminsAPI = await api_get(
         "get_tech_admins",
         TechAdminsAPI

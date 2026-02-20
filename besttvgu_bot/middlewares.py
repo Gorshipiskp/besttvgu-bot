@@ -5,9 +5,9 @@ from aiogram import BaseMiddleware
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import Message, Update
 
-from besttvgu_bot.api_contracts.models import UserFullPublic
-from besttvgu_bot.api_contracts.pdn.contracts import check_user_consents
-from besttvgu_bot.api_contracts.user.contracts import get_user
+from besttvgu_bot.api_contracts.models import UserFull
+from besttvgu_bot.api_contracts.pdn.contracts import check_user_consents_contract
+from besttvgu_bot.api_contracts.user.contracts import get_user_contract
 from besttvgu_bot.config import SHOW_MIDDLEWARES_PERFORMANCE, TELEGRAM_CHANNEL_LINK, WEBSITE_URL
 from besttvgu_bot.consts import Templates
 from besttvgu_bot.misc.caching import user_cache, CacheIdentifiers, user_consents_cache
@@ -42,7 +42,7 @@ class CheckRegisterMiddleware(BaseMiddleware):
             return
 
         async def check_user_consents_kruto() -> bool:
-            return await check_user_consents(update.from_user.id)
+            return await check_user_consents_contract(update.from_user.id)
 
         is_consents_accepted: bool = await user_consents_cache.get_or_set(
             CacheIdentifiers.check_user_consents(update.from_user.id),
@@ -96,9 +96,9 @@ class GeneralInfoMiddlewareBase(PerformanceMiddlewareBase):
         data["website_url"] = WEBSITE_URL
 
 
-async def update_user(message: Message) -> UserFullPublic | None:
+async def update_user(message: Message) -> UserFull | None:
     async def user_get():
-        return await get_user(message.from_user.id)
+        return await get_user_contract(message.from_user.id)
 
     return await user_cache.get_or_set(
         CacheIdentifiers.user_info(message.from_user.id),
@@ -136,7 +136,7 @@ class PerformanceMessageHandler(PerformanceMiddlewareBase):
 
 class UserCommandsMiddleware(PerformanceMiddlewareBase):
     async def middleware_logic(self, message: Message, data: dict) -> None:
-        user: UserFullPublic | None = data.get("user", False)
+        user: UserFull | None = data.get("user", False)
 
         if user is False:
             raise RuntimeError(

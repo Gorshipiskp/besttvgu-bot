@@ -2,7 +2,7 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message, BotCommand
 
-from besttvgu_bot.api_contracts.models import UserFullPublic, format_group_type, UserGroupPublic
+from besttvgu_bot.api_contracts.models import UserFull, format_group_type, UserGroupPublic
 from besttvgu_bot.consts import Templates
 from besttvgu_bot.middlewares import CheckRegisterMiddleware
 from besttvgu_bot.misc.jinja import answer_by_template
@@ -28,7 +28,7 @@ register_command(
 
 
 @router.message(Command("profile"))
-async def profile(message: Message, user: UserFullPublic) -> None:
+async def profile(message: Message, user: UserFull) -> None:
     groups_ids_to_user_group: dict[int, UserGroupPublic] = {}
 
     for group in user.groups:
